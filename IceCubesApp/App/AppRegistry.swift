@@ -8,10 +8,10 @@ import LinkPresentation
 import Lists
 import MediaUI
 import Models
+import Notifications
 import StatusKit
 import SwiftUI
 import Timeline
-import Notifications
 
 @MainActor
 extension View {
@@ -67,9 +67,13 @@ extension View {
       case .notificationsRequests:
         NotificationsRequestsListView()
       case let .notificationForAccount(accountId):
-        NotificationsListView(lockedType: nil ,
+        NotificationsListView(lockedType: nil,
                               lockedAccountId: accountId,
                               scrollToTopSignal: .constant(0))
+      case .blockedAccounts:
+        AccountsListView(mode: .blocked)
+      case .mutedAccounts:
+        AccountsListView(mode: .muted)
       }
     }
   }
@@ -81,7 +85,13 @@ extension View {
         StatusEditor.MainView(mode: .replyTo(status: status))
           .withEnvironments()
       case let .newStatusEditor(visibility):
-        StatusEditor.MainView(mode: .new(visibility: visibility))
+        StatusEditor.MainView(mode: .new(text: nil, visibility: visibility))
+          .withEnvironments()
+      case let .prefilledStatusEditor(text, visibility):
+        StatusEditor.MainView(mode: .new(text: text, visibility: visibility))
+          .withEnvironments()
+      case let .imageURL(urls, visibility):
+        StatusEditor.MainView(mode: .imageURL(urls: urls, visibility: visibility))
           .withEnvironments()
       case let .editStatusEditor(status):
         StatusEditor.MainView(mode: .edit(status: status))
